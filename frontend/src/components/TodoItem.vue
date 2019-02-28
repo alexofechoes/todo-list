@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stroke: !task.isOpen, task }" @click="$emit('toggle')">{{ task.name }}</div>
+    <div :class="{ stroke: !todo.isOpen, todo }" @click="$emit('toggle')">{{ todo.name }}</div>
     <button @click="$emit('delete')">x</button>
   </div>
 </template>
@@ -10,13 +10,13 @@ export default {
   name: "TodoItem",
 
   props: {
-    task: Object
+    todo: Object
   }
 };
 </script>
 
 <style scoped>
-.task {
+.todo {
   display: inline-block;
   padding: 10px;
   font-size: 1.5rem;

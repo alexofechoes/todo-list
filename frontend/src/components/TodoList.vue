@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h1>todo</h1>
+    <h1>todo list</h1>
     <ul>
-      <li v-for="task in tasks" :key="task.id">
+      <li v-for="todo in todos" :key="todo.id">
         <TodoItem
-          :task="task"
-          @toggle="$emit('task-toogle', task.id)"
-          @delete="$emit('task-delete', task.id)"
+          :todo="todo"
+          @toggle="$emit('todo-toogle', todo.id)"
+          @delete="$emit('todo-delete', todo.id)"
         />
       </li>
     </ul>
@@ -24,7 +24,7 @@ export default {
   },
 
   props: {
-    tasks: Array
+    todos: Array
   }
 };
 </script>

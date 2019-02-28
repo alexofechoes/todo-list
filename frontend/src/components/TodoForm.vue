@@ -2,7 +2,7 @@
   <div>
     <form>
       <label>
-        <input type="text" :value="taskName" @change="changeHandle">
+        <input type="text" :value="name" @change="changeHandle">
       </label>
       <button type="submit" @click="submitHandle">create</button>
     </form>
@@ -15,19 +15,19 @@ export default {
 
   data() {
     return {
-      taskName: ""
+      name: ""
     };
   },
 
   methods: {
     changeHandle(e) {
-      this.taskName = e.target.value;
+      this.name = e.target.value;
     },
 
     submitHandle(e) {
       e.preventDefault();
-      this.$emit("task-create", this.taskName);
-      this.taskName = "";
+      this.$emit("todo-create", this.name);
+      this.name = "";
     }
   }
 };

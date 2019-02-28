@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <TodoForm @task-create="createHandle"/>
-    <TodoList :tasks="tasks" @task-toogle="toogleHandle" @task-delete="deleteHandle"/>
+    <TodoForm @todo-create="createHandle"/>
+    <TodoList :todos="todos" @todo-toogle="toogleHandle" @todo-delete="deleteHandle"/>
   </div>
 </template>
 
@@ -26,14 +26,14 @@ export default {
 
   data() {
     return {
-      tasks: []
+      todos: []
     };
   },
 
   created: async function() {
     try {
       const { data } = await axios.get(`${todoApiEndpoint}?format=json`);
-      this.tasks = data.map(keysToCamelCase);
+      this.todos = data.map(keysToCamelCase);
     } catch (err) {
       console.log(err);
     }
@@ -43,35 +43,35 @@ export default {
     createHandle: async function(name) {
       try {
         const { data } = await axios.post(todoApiEndpoint, { name });
-        this.tasks.push(keysToCamelCase(data));
+        this.todos.push(keysToCamelCase(data));
       } catch (err) {
         console.log(err);
       }
     },
 
-    toogleHandle: async function(taskId) {
-      const taskIndex = findIndexById(this.tasks, taskId);
-      if (taskIndex === null) {
+    toogleHandle: async function(todoId) {
+      const todoIndex = findIndexById(this.todos, todoId);
+      if (todoIndex === null) {
         return;
       }
 
-      const task = this.tasks[taskIndex];
-      const updatedTask = { ...task, isOpen: !task.isOpen };
+      const todo = this.todos[todoIndex];
+      const updatedtodo = { ...todo, isOpen: !todo.isOpen };
       try {
         await axios.put(
-          `${todoApiEndpoint}${taskId}/`,
-          keysToSnakeCase(updatedTask)
+          `${todoApiEndpoint}${todoId}/`,
+          keysToSnakeCase(updatedtodo)
         );
-        this.$set(this.tasks, taskIndex, updatedTask);
+        this.$set(this.todos, todoIndex, updatedtodo);
       } catch (err) {
         console.log(err);
       }
     },
 
-    deleteHandle: async function(taskId) {
+    deleteHandle: async function(todoId) {
       try {
-        await axios.delete(`${todoApiEndpoint}${taskId}/`);
-        this.$delete(this.tasks, findIndexById(this.tasks, taskId));
+        await axios.delete(`${todoApiEndpoint}${todoId}/`);
+        this.$delete(this.todos, findIndexById(this.todos, todoId));
       } catch (err) {
         console.log(err);
       }
