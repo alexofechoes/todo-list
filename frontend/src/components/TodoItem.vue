@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stroke: !task.isOpen, task }" @click="$emit('toggle')">{{ task.text }}</div>
+    <div :class="{ stroke: !task.isOpen, task }" @click="$emit('toggle')">{{ task.name }}</div>
     <button @click="$emit('delete')">x</button>
   </div>
 </template>

@@ -40,9 +40,9 @@ export default {
   },
 
   methods: {
-    createHandle: async function(text) {
+    createHandle: async function(name) {
       try {
-        const { data } = await axios.post(todoApiEndpoint, { text });
+        const { data } = await axios.post(todoApiEndpoint, { name });
         this.tasks.push(keysToCamelCase(data));
       } catch (err) {
         console.log(err);
