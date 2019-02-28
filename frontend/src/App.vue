@@ -8,7 +8,8 @@
 <script>
 import _ from "lodash";
 import axios from "axios";
-import { keysToCamelCase, keysToSnakeCase } from './helpers/object-helper'
+import { findIndexById } from "./helpers/collection-helper";
+import { keysToCamelCase, keysToSnakeCase } from "./helpers/object-helper";
 
 import TodoList from "./components/TodoList.vue";
 import TodoForm from "./components/TodoForm.vue";
@@ -49,15 +50,18 @@ export default {
     },
 
     toogleHandle: async function(taskId) {
-      const taskIndex = this.findTaskIndex(taskId);
-      if (!taskIndex === null) {
+      const taskIndex = findIndexById(this.tasks, taskId);
+      if (taskIndex === null) {
         return;
       }
 
       const task = this.tasks[taskIndex];
       const updatedTask = { ...task, isOpen: !task.isOpen };
       try {
-        await axios.put(`${todoApiEndpoint}${taskId}/`, keysToSnakeCase(updatedTask));
+        await axios.put(
+          `${todoApiEndpoint}${taskId}/`,
+          keysToSnakeCase(updatedTask)
+        );
         this.$set(this.tasks, taskIndex, updatedTask);
       } catch (err) {
         console.log(err);
@@ -67,14 +71,10 @@ export default {
     deleteHandle: async function(taskId) {
       try {
         await axios.delete(`${todoApiEndpoint}${taskId}/`);
-        this.$delete(this.tasks, this.findTaskIndex(taskId));
+        this.$delete(this.tasks, findIndexById(this.tasks, taskId));
       } catch (err) {
         console.log(err);
       }
-    },
-
-    findTaskIndex(taskId) {
-      return this.tasks.findIndex(task => task.id === taskId);
     }
   }
 };
