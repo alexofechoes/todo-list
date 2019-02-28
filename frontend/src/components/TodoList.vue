@@ -2,8 +2,12 @@
   <div>
     <h1>todo</h1>
     <ul>
-      <li v-for="task in tasks" :key="task.id" @click="$emit('task-toogle', task.id)">
-        <TodoItem :task="task"/>
+      <li v-for="task in tasks" :key="task.id">
+        <TodoItem
+          :task="task"
+          @toggle="$emit('task-toogle', task.id)"
+          @delete="$emit('task-delete', task.id)"
+        />
       </li>
     </ul>
   </div>
@@ -14,9 +18,11 @@ import TodoItem from "./TodoItem.vue";
 
 export default {
   name: "TodoList",
+
   components: {
     TodoItem
   },
+
   props: {
     tasks: Array
   }

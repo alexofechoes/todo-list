@@ -1,17 +1,20 @@
 <template>
-  <div v-bind:class="{ stroke: !task.isOpen, task }">{{ task.text }}</div>
+  <div>
+    <div :class="{ stroke: !task.isOpen, task }" @click="$emit('toggle')">{{ task.text }}</div>
+    <button @click="$emit('delete')">x</button>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'TodoItem',
+  name: "TodoItem",
+
   props: {
     task: Object
-  },
-}
+  }
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .task {
   display: inline-block;

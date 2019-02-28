@@ -1,50 +1,82 @@
 <template>
   <div id="app">
-    <TodoList :tasks="tasks" @task-toogle="toogleHandle"/>
+    <TodoForm @task-create="createHandle"/>
+    <TodoList :tasks="tasks" @task-toogle="toogleHandle" @task-delete="deleteHandle"/>
   </div>
 </template>
 
 <script>
 import _ from "lodash";
-import TodoList from "./components/TodoList.vue";
+import axios from "axios";
 
-todoApiEndpoint = "http://localhost:8888/todo/?format=json";
+import TodoList from "./components/TodoList.vue";
+import TodoForm from "./components/TodoForm.vue";
+
+const todoApiEndpoint = "http://localhost:8888/todo/";
 
 export default {
   name: "app",
 
   components: {
-    TodoList
+    TodoList,
+    TodoForm
   },
-  created() {
-    fetch(todoApiEndpoint, {
-      method: "get",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
-    })
-      .then(response => response.json())
-      .then(tasks => {
-        this.tasks = tasks.map(task =>
-          _.mapKeys(task, (v, k) => _.camelCase(k))
-        );
-      })
-      .catch(err => console.log("error", err));
-  },
+
   data() {
     return {
       tasks: []
     };
   },
+
+  created: async function() {
+    try {
+      const { data } = await axios.get(`${todoApiEndpoint}?format=json`);
+      this.tasks = data.map(task => _.mapKeys(task, (v, k) => _.camelCase(k)));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
   methods: {
-    toogleHandle(taskId) {
-      const taskIndex = this.tasks.findIndex(task => task.id === taskId);
+    createHandle: async function(text) {
+      try {
+        const { data } = await axios.post(todoApiEndpoint, { text });
+        this.tasks.push(_.mapKeys(data, (v, k) => _.camelCase(k)));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    toogleHandle: async function(taskId) {
+      const taskIndex = this.findTaskIndex(taskId);
       if (!taskIndex === null) {
         return;
       }
+
       const task = this.tasks[taskIndex];
-      this.$set(this.tasks, taskIndex, { ...task, isOpen: !task.isOpen });
+      const updatedTask = { ...task, isOpen: !task.isOpen };
+      try {
+        await axios.put(
+          `${todoApiEndpoint}${taskId}/`,
+          _.mapKeys(updatedTask, (v, k) => _.snakeCase(k))
+        );
+        this.$set(this.tasks, taskIndex, updatedTask);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    deleteHandle: async function(taskId) {
+      try {
+        await axios.delete(`${todoApiEndpoint}${taskId}/`);
+        this.$delete(this.tasks, this.findTaskIndex(taskId));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    findTaskIndex(taskId) {
+      return this.tasks.findIndex(task => task.id === taskId);
     }
   }
 };
