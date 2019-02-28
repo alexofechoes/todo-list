@@ -8,6 +8,7 @@
 <script>
 import _ from "lodash";
 import axios from "axios";
+import { keysToCamelCase, keysToSnakeCase } from './helpers/object-helper'
 
 import TodoList from "./components/TodoList.vue";
 import TodoForm from "./components/TodoForm.vue";
@@ -31,7 +32,7 @@ export default {
   created: async function() {
     try {
       const { data } = await axios.get(`${todoApiEndpoint}?format=json`);
-      this.tasks = data.map(task => _.mapKeys(task, (v, k) => _.camelCase(k)));
+      this.tasks = data.map(keysToCamelCase);
     } catch (err) {
       console.log(err);
     }
@@ -41,7 +42,7 @@ export default {
     createHandle: async function(text) {
       try {
         const { data } = await axios.post(todoApiEndpoint, { text });
-        this.tasks.push(_.mapKeys(data, (v, k) => _.camelCase(k)));
+        this.tasks.push(keysToCamelCase(data));
       } catch (err) {
         console.log(err);
       }
@@ -56,10 +57,7 @@ export default {
       const task = this.tasks[taskIndex];
       const updatedTask = { ...task, isOpen: !task.isOpen };
       try {
-        await axios.put(
-          `${todoApiEndpoint}${taskId}/`,
-          _.mapKeys(updatedTask, (v, k) => _.snakeCase(k))
-        );
+        await axios.put(`${todoApiEndpoint}${taskId}/`, keysToSnakeCase(updatedTask));
         this.$set(this.tasks, taskIndex, updatedTask);
       } catch (err) {
         console.log(err);
