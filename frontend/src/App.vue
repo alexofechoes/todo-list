@@ -6,15 +6,12 @@
 </template>
 
 <script>
-import _ from "lodash";
-import axios from "axios";
+import { fetchTodoList, createTodo, updateTodo, deleteTodo } from "./api/todo-api";
 import { findIndexById } from "./helpers/collection-helper";
 import { keysToCamelCase, keysToSnakeCase } from "./helpers/object-helper";
 
 import TodoList from "./components/TodoList.vue";
 import TodoForm from "./components/TodoForm.vue";
-
-const todoApiEndpoint = "http://localhost:8888/todo/";
 
 export default {
   name: "app",
@@ -32,8 +29,8 @@ export default {
 
   created: async function() {
     try {
-      const { data } = await axios.get(`${todoApiEndpoint}?format=json`);
-      this.todos = data.map(keysToCamelCase);
+      const todoListData = await fetchTodoList();
+      this.todos = todoListData.map(keysToCamelCase);
     } catch (err) {
       console.log(err);
     }
@@ -42,8 +39,8 @@ export default {
   methods: {
     createHandle: async function(name) {
       try {
-        const { data } = await axios.post(todoApiEndpoint, { name });
-        this.todos.push(keysToCamelCase(data));
+        const todoData = await createTodo(name);
+        this.todos.push(keysToCamelCase(todoData));
       } catch (err) {
         console.log(err);
       }
@@ -58,10 +55,7 @@ export default {
       const todo = this.todos[todoIndex];
       const updatedtodo = { ...todo, isOpen: !todo.isOpen };
       try {
-        await axios.put(
-          `${todoApiEndpoint}${todoId}/`,
-          keysToSnakeCase(updatedtodo)
-        );
+        await updateTodo(todoId, keysToSnakeCase(updatedtodo));
         this.$set(this.todos, todoIndex, updatedtodo);
       } catch (err) {
         console.log(err);
@@ -70,7 +64,7 @@ export default {
 
     deleteHandle: async function(todoId) {
       try {
-        await axios.delete(`${todoApiEndpoint}${todoId}/`);
+        await deleteTodo(todoId);
         this.$delete(this.todos, findIndexById(this.todos, todoId));
       } catch (err) {
         console.log(err);
